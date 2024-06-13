@@ -9,11 +9,40 @@ trigger:
 pool: default
   #vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+stages:
+  - stage: Install
+    jobs: 
+      - job: Install_tf
+        steps:
+        - task: CmdLine@2
+          inputs:
+            script: 'sudo apt install unzip'
+        - task: TerraformInstaller@1
+          inputs:
+            terraformVersion: 'latest'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+
+  
+  - stage: Initialize
+    jobs: 
+      - job: Initialize
+        steps:
+        - task: TerraformTaskV4@4
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: 'ado'
+            backendAzureRmResourceGroupName: 'terraform-storage-rg'
+            backendAzureRmStorageAccountName: 'terraformtfstateversion'
+            backendAzureRmContainerName: 'terraformstate'
+            backendAzureRmKey: 'prod.terraform.tfstate'
+
+  - stage: tf_validate
+    jobs: 
+      - job: Validate
+        steps:
+        - task: TerraformTaskV4@4
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
+
