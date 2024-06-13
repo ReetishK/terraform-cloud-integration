@@ -61,3 +61,38 @@ stages:
             provider: 'azurerm'
             command: 'plan'
             environmentServiceNameAzureRM: 'ado'
+
+  - stage:
+    jobs:
+      - job:
+        pool: server #will run in azure dev-ops
+        timeoutInMinutes: 1
+        steps:
+        - task: ManualValidation@1
+          inputs:
+            notifyUsers: 'reetish244@gmail.com'
+
+  - stage: apply
+    jobs: 
+      - job: apply
+        steps:
+        - task: TerraformInstaller@1
+          displayName: terrafomr install
+          inputs:
+            terraformVersion: 'latest'
+        - task: TerraformTaskV4@4
+          displayName: terraform init
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: 'ado'
+            backendAzureRmResourceGroupName: 'terraform-storage-rg'
+            backendAzureRmStorageAccountName: 'terraformtfstateversion'
+            backendAzureRmContainerName: 'terraformstate'
+            backendAzureRmKey: 'project.terraform.tfstate'
+        - task: TerraformTaskV4@4
+          displayName: Terraform apply
+          inputs:
+            provider: 'azurerm'
+            command: 'apply'
+            environmentServiceNameAzureRM: 'ado'
