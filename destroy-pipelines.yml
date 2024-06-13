@@ -1,3 +1,9 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+
 trigger:
 - master
 
@@ -25,3 +31,69 @@ stages:
             backendAzureRmStorageAccountName: 'terraformtfstateversion'
             backendAzureRmContainerName: 'terraformstate'
             backendAzureRmKey: 'project.terraform.tfstate'
+        - task: TerraformTaskV4@4
+          displayName: validatiing the code
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
+
+  - stage: tfplan
+    jobs: 
+      - job: plan
+        steps:
+        - task: TerraformInstaller@1
+          displayName: terraform install
+          inputs:
+            terraformVersion: 'latest'
+        - task: TerraformTaskV4@4
+          displayName: terraform init
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: 'ado'
+            backendAzureRmResourceGroupName: 'terraform-storage-rg'
+            backendAzureRmStorageAccountName: 'terraformtfstateversion'
+            backendAzureRmContainerName: 'terraformstate'
+            backendAzureRmKey: 'project.terraform.tfstate'
+
+        - task: TerraformTaskV4@4
+          displayName: terraform plan
+          inputs:
+            provider: 'azurerm'
+            command: 'plan'
+            environmentServiceNameAzureRM: 'ado'
+
+  - stage:
+    jobs:
+      - job:
+        pool: server #will run in azure dev-ops
+        timeoutInMinutes: 1
+        steps:
+        - task: ManualValidation@1
+          inputs:
+            notifyUsers: 'reetish244@gmail.com'
+
+  - stage: apply
+    jobs: 
+      - job: apply
+        steps:
+        - task: TerraformInstaller@1
+          displayName: terrafomr install
+          inputs:
+            terraformVersion: 'latest'
+        - task: TerraformTaskV4@4
+          displayName: terraform init
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: 'ado'
+            backendAzureRmResourceGroupName: 'terraform-storage-rg'
+            backendAzureRmStorageAccountName: 'terraformtfstateversion'
+            backendAzureRmContainerName: 'terraformstate'
+            backendAzureRmKey: 'project.terraform.tfstate'
+        - task: TerraformTaskV4@4
+          displayName: Terraform apply
+          inputs:
+            provider: 'azurerm'
+            command: 'apply'
+            environmentServiceNameAzureRM: 'ado'
