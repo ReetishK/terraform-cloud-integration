@@ -11,16 +11,6 @@ pool: default
 
 stages:
 
-  - stage: tf_validate
-    jobs: 
-      - job: Validate
-        steps:
-        - task: TerraformTaskV4@4
-          inputs:
-            provider: 'azurerm'
-            command: 'validate'
-
-
   - stage: Install
     jobs: 
       - job: Install_tf
@@ -32,8 +22,16 @@ stages:
           inputs:
             terraformVersion: 'latest'
 
+  - stage: tf_validate
+    jobs: 
+      - job: Validate
+        steps:
+        - task: TerraformTaskV4@4
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
 
-  
+
   - stage: Initialize
     jobs: 
       - job: Initialize
