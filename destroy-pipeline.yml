@@ -73,9 +73,9 @@ stages:
           inputs:
             notifyUsers: 'reetish244@gmail.com'
 
-  - stage: apply
+  - stage: tfdestroy
     jobs: 
-      - job: apply
+      - job: destroy
         steps:
         - task: TerraformInstaller@1
           displayName: terrafomr install
@@ -92,8 +92,10 @@ stages:
             backendAzureRmContainerName: 'terraformstate'
             backendAzureRmKey: 'project.terraform.tfstate'
         - task: TerraformTaskV4@4
-          displayName: Terraform apply
+          displayName: Terraform destroy
           inputs:
             provider: 'azurerm'
-            command: 'apply'
+            command: 'destroy'
             environmentServiceNameAzureRM: 'ado'
+
+            
