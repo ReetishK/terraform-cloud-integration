@@ -10,6 +10,17 @@ pool: default
   #vmImage: ubuntu-latest
 
 stages:
+
+  - stage: tf_validate
+    jobs: 
+      - job: Validate
+        steps:
+        - task: TerraformTaskV4@4
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
+
+
   - stage: Install
     jobs: 
       - job: Install_tf
@@ -37,12 +48,4 @@ stages:
             backendAzureRmContainerName: 'terraformstate'
             backendAzureRmKey: 'prod.terraform.tfstate'
 
-  - stage: tf_validate
-    jobs: 
-      - job: Validate
-        steps:
-        - task: TerraformTaskV4@4
-          inputs:
-            provider: 'azurerm'
-            command: 'validate'
 
