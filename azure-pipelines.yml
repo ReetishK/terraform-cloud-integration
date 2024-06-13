@@ -11,8 +11,6 @@ pool: default
 
 stages:
 
-  
-
 
   - stage: tfvalidate
     jobs: 
@@ -38,3 +36,28 @@ stages:
             provider: 'azurerm'
             command: 'validate'
 
+  - stage: tfplan
+    jobs: 
+      - job: plan
+        steps:
+        - task: TerraformInstaller@1
+          displayName: terraform install
+          inputs:
+            terraformVersion: 'latest'
+        - task: TerraformTaskV4@4
+          displayName: terraform init
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: 'ado'
+            backendAzureRmResourceGroupName: 'terraform-storage-rg'
+            backendAzureRmStorageAccountName: 'terraformtfstateversion'
+            backendAzureRmContainerName: 'terraformstate'
+            backendAzureRmKey: 'project.terraform.tfstate'
+
+        - task: TerraformTaskV4@4
+          displayName: terraform plan
+          inputs:
+            provider: 'azurerm'
+            command: 'plan'
+            environmentServiceNameAzureRM: 'ado'
