@@ -22,15 +22,6 @@ stages:
           inputs:
             terraformVersion: 'latest'
 
-  - stage: tf_validate
-    jobs: 
-      - job: Validate
-        steps:
-        - task: TerraformTaskV4@4
-          inputs:
-            provider: 'azurerm'
-            command: 'validate'
-
 
   - stage: Initialize
     jobs: 
@@ -44,6 +35,14 @@ stages:
             backendAzureRmResourceGroupName: 'terraform-storage-rg'
             backendAzureRmStorageAccountName: 'terraformtfstateversion'
             backendAzureRmContainerName: 'terraformstate'
-            backendAzureRmKey: 'prod.terraform.tfstate'
+            backendAzureRmKey: 'project.terraform.tfstate'
 
+  - stage: tf_validate
+    jobs: 
+      - job: Validate
+        steps:
+        - task: TerraformTaskV4@4
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
 
