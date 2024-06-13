@@ -1,0 +1,27 @@
+trigger:
+- master
+
+pool: default
+  #vmImage: ubuntu-latest
+
+stages:
+
+
+  - stage: tfvalidate
+    jobs: 
+      - job: validate
+        steps:
+        - task: TerraformInstaller@1
+          displayName: terrafomr install
+          inputs:
+            terraformVersion: 'latest'
+        - task: TerraformTaskV4@4
+          displayName: terraform init
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            backendServiceArm: 'ado'
+            backendAzureRmResourceGroupName: 'terraform-storage-rg'
+            backendAzureRmStorageAccountName: 'terraformtfstateversion'
+            backendAzureRmContainerName: 'terraformstate'
+            backendAzureRmKey: 'project.terraform.tfstate'
