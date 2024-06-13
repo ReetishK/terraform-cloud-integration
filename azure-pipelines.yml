@@ -11,26 +11,19 @@ pool: default
 
 stages:
 
-  - stage: Install
-    jobs: 
-      - job: Install_tf
-        steps:
-        - task: CmdLine@2
-          inputs:
-            script: 'sudo apt install unzip'
-        - task: TerraformInstaller@1
-          inputs:
-            terraformVersion: 'latest'
+  
 
 
-  - stage: Initialize
+  - stage: tfvalidate
     jobs: 
-      - job: Initialize
+      - job: validate
         steps:
         - task: TerraformInstaller@1
+          displayName: terrafomr install
           inputs:
             terraformVersion: 'latest'
         - task: TerraformTaskV4@4
+          displayName: terraform init
           inputs:
             provider: 'azurerm'
             command: 'init'
@@ -39,12 +32,8 @@ stages:
             backendAzureRmStorageAccountName: 'terraformtfstateversion'
             backendAzureRmContainerName: 'terraformstate'
             backendAzureRmKey: 'project.terraform.tfstate'
-
-  - stage: tf_validate
-    jobs: 
-      - job: Validate
-        steps:
         - task: TerraformTaskV4@4
+          displayName: validatiing the code
           inputs:
             provider: 'azurerm'
             command: 'validate'
